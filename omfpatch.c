@@ -69,6 +69,9 @@ void load_segs(const char* fname)
                            typebuf, &c->firstofs, &c->lastofs,
                                     &c->sumofs, &dummy) != 4)
                     DIE("malformed checksum specification\n%s\n", linebuf);
+                if (c->firstofs > c->lastofs)
+                    DIE("checksum area start %lx after end %lx\n",
+                        c->firstofs, c->lastofs);
                 if(strcmp(typebuf, "SUM8") == 0)
                     c->type = CHKS_SUM8;
                 else
@@ -86,6 +89,9 @@ void load_segs(const char* fname)
         if (sscanf(linebuf, "%16s %li %i %i %c",
              s->name, &s->fileofs, &s->base, &s->limit, &dummy) != 4)
             DIE("Syntax error in line\n%s\n", linebuf);
+        if (s->base > s->limit)
+            DIE("Segment %s: limit %x below base %x\n",
+                s->name, s->limit, s->base);
         segs++;
     }
 }
