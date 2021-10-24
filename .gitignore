@@ -1,0 +1,6 @@
+*.obj
+*.exe
+*.com
+*.bin
+*.lst
+demo\demo1.bin

@@ -1,0 +1,5 @@
+#  SEG1 is meant to model a COM file with base 0x100
+#  SEG1 and SEG2 both occupy 16 bytes in the DEMO.BIN file
+# segname  fileofs  base  limit
+SEG1        0      0x100    0x10F
+SEG2       16      0x000    0x00F
