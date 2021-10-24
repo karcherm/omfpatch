@@ -54,7 +54,8 @@ void load_segs(const char* fname)
         char dummy;
         seg_t *s = &segtable[segs];
         unsigned linelen = strlen(linebuf);
-        if (!linelen)
+        if (!linelen ||
+            (linelen == 1 && linebuf[0] == '\n'))
             continue;
         if (linebuf[0] == '#')
             continue;
