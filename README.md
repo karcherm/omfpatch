@@ -101,3 +101,17 @@ END
 ```
 
 The point of this example is to show you the main point of the tool: You can write patches to assembly code using assembly language. You can add labels to addresses you don't intend to patch. You can do address arithmetics in the patch.
+
+Checksum adjustment
+-------------------
+
+omfpatch supports the `!CHKSUM` directive in the MAP file. If a line starts with `!CHKSUM`, the remaining part of the line contains the algorithm (a single word), the offset of the first byte to include in the checksum, the offset of the last byte to include in the checksum and the offset of the first byte of the checksum location.
+
+Currently, the only supported checksum algorithm is `SUM8`, which ensures that the sum of all bytes in the range (plus the checksum byte if it is outside of the range) have an 8-bit sum of zero. This is the algorithm used by the BIOS to validate expansion ROMS, for example. A map file for a classic 32K VGA ROM might look like this:
+
+```
+MAIN 0 0 0x7FFF
+!CHKSUM SUM8 0 0x7FFF 0x7FFF
+```
+
+This will overwrite the last byte (offset 0x7fff) with a value that makes the whole file have a 8-bit checksum of zero.

@@ -6,6 +6,7 @@ const int dbg = 0;
 #include <string.h>
 
 #define MAX_SEGS 20
+#define MAX_CHKS 5
 
 typedef struct {
     char name[17];
@@ -16,11 +17,21 @@ typedef struct {
     int segidx;
 } seg_t;
 
+typedef enum { CHKS_SUM8 } checksumtype;
+typedef struct {
+    long firstofs;
+    long lastofs;
+    long sumofs;
+    checksumtype type;
+} chks_t;
+
 // the code USES the property that globals are zero-initialized,
 // and relies on nameidx and segidx being zero (an invalid obj index)
 seg_t segtable[MAX_SEGS];
+chks_t checksums[MAX_CHKS];
 
 unsigned segs;
+unsigned chks;
 unsigned nameidx = 0;
 unsigned segidx = 0;
 
@@ -47,6 +58,26 @@ void load_segs(const char* fname)
             continue;
         if (linebuf[0] == '#')
             continue;
+        if (linebuf[0] == '!')
+        {
+            if (strncmp(linebuf + 1, "CHKSUM", 6) == 0)
+            {
+                char typebuf[9];
+                chks_t *c = &checksums[chks];
+                if (sscanf(linebuf + 7, "%8s %li %li %li %c",
+                           typebuf, &c->firstofs, &c->lastofs,
+                                    &c->sumofs, &dummy) != 4)
+                    DIE("malformed checksum specification\n%s\n", linebuf);
+                if(strcmp(typebuf, "SUM8") == 0)
+                    c->type = CHKS_SUM8;
+                else
+                    DIE("unknown checksum algorithm %s\n", typebuf);
+                chks++;
+            }
+            else
+                DIE("unknown directive\n%s\n", linebuf);
+            continue;
+        }
         if (segs == MAX_SEGS)
             DIE("Too many segments\n");
         if (linebuf[linelen-1] != '\n' && linelen == sizeof(linebuf) - 1)
@@ -368,8 +399,35 @@ void handle_lidata(record_t *r, FILE *bin)
     }
 }
 
+void fix_checksum(chks_t *dtor, FILE *bin)
+{
+    long current = dtor->firstofs;
+    long bytes = dtor->lastofs - current + 1;
+    fseek(bin, current, SEEK_SET);
+    switch(dtor->type)
+    {
+        case CHKS_SUM8:
+        {
+            unsigned char sum = 0;
+            while (bytes--)
+            {
+                int next = getc(bin);
+                if (next == EOF)
+                    DIE("can't read data for checksum\n");
+                if (current == dtor->sumofs)  // mask byte to be overwritten
+                    next = 0;
+                sum += (unsigned char)next;
+                current++;
+            }
+            fseek(bin, dtor->sumofs, SEEK_SET);
+            putc((unsigned char)-sum, bin);
+        }
+    }
+}
+
 void apply_patch(FILE *bin, FILE *obj)
 {
+    int c;
     record_t r;
     if (!read_record(obj, &r) || r.type != 0x80)
         DIE("patch file doesn't start with a THEADR record\n");
@@ -380,7 +438,7 @@ void apply_patch(FILE *bin, FILE *obj)
         case 0x88:   // comment record
             break;
         case 0x8A:
-            return;
+            goto done;
         case 0x96:
             handle_names(&r);
             break;
@@ -402,6 +460,10 @@ void apply_patch(FILE *bin, FILE *obj)
             break;
         }
     }
+    fprintf(stderr, "WARNING: no end of module record encountered\n");
+done:
+    for (c = 0; c < chks; c++)
+        fix_checksum(checksums + c, bin);
 }
 
 int main(int argc, char *argv[])
