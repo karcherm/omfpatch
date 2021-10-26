@@ -1,0 +1,25 @@
+name: Main Workflow
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build-win32:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x86
+      - name: compile Win32
+        run: .\build_vs.bat
+      - uses: actions/upload-artifact@v2
+        with:
+          name: exectutable-win32
+          path: omfpatch.exe
