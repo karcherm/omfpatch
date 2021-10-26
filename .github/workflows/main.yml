@@ -23,3 +23,13 @@ jobs:
         with:
           name: exectutable-win32
           path: omfpatch.exe
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: gcc -O2 -o omfpatch omfpatch.c
+      - uses: actions/upload-artifact@v2
+        with:
+          name: executable-linux
+          path: omfpatch
