@@ -21,7 +21,7 @@ jobs:
         run: .\build_vs.bat
       - uses: actions/upload-artifact@v2
         with:
-          name: exectutable-win32
+          name: executable-win32
           path: omfpatch.exe
 
   build-linux:
@@ -33,3 +33,32 @@ jobs:
         with:
           name: executable-linux
           path: omfpatch
+
+  test-linux:
+    runs-on: ubuntu-latest
+    needs: build-linux
+    steps:
+      - uses: actions/checkout@v2
+      - uses: karcherm/action-install-jw@v0.0.2
+        with:
+          jwasm: true
+      - uses: actions/download-artifact@v2
+        with:
+          name: executable-linux
+      - run: chmod 755 omfpatch
+      - run: cd demo; source demo.sh
+        shell: bash
+
+  test-win32:
+    runs-on: windows-latest
+    needs: build-win32
+    steps:
+      - uses: actions/checkout@v2
+      - uses: karcherm/action-install-jw@v0.0.2
+        with:
+          jwasm: true
+      - uses: actions/download-artifact@v2
+        with:
+          name: executable-win32
+      - run: cd demo; source demo.sh
+        shell: bash
