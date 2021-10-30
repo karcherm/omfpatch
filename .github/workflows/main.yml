@@ -48,7 +48,7 @@ jobs:
       - run: chmod 755 omfpatch
       - run: |
           cd demo
-          jwasm demo1.asm -Fodemo1.obj
+          jwasm -Fodemo1.obj demo1.asm
           ls
           cp demo.in demo1.bin
           ../omfpatch demo1.bin demo.map demo1.obj
