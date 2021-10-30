@@ -39,7 +39,7 @@ jobs:
     needs: build-linux
     steps:
       - uses: actions/checkout@v2
-      - uses: karcherm/action-install-jw@v0.0.2
+      - uses: karcherm/action-install-jw@v1.0
         with:
           jwasm: true
       - uses: actions/download-artifact@v2
@@ -54,7 +54,7 @@ jobs:
     needs: build-win32
     steps:
       - uses: actions/checkout@v2
-      - uses: karcherm/action-install-jw@v0.0.2
+      - uses: karcherm/action-install-jw@v1.0
         with:
           jwasm: true
       - uses: actions/download-artifact@v2
