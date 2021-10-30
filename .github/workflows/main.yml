@@ -21,7 +21,7 @@ jobs:
         run: .\build_vs.bat
       - uses: actions/upload-artifact@v2
         with:
-          name: exectutable-win32
+          name: executable-win32
           path: omfpatch.exe
 
   build-linux:
