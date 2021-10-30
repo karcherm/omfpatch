@@ -71,7 +71,7 @@ jobs:
           jwasm: true
       - uses: actions/download-artifact@v2
         with:
-          name: executable-windows
+          name: executable-win32
       - run: |
           cd demo
           jwasm -q -Fodemo1.obj demo1.asm
