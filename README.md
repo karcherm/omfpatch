@@ -1,6 +1,8 @@
 omfpatch - Use Intel/Microsoft .OBJ files as binary diffs
 =========================================================
 
+[![Build and test of main branch](https://github.com/karcherm/omfpatch/actions/workflows/main.yml/badge.svg)](https://github.com/karcherm/omfpatch/actions/workflows/main.yml)
+
 Overview
 --------
 
