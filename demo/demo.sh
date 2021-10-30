@@ -1,5 +1,4 @@
 #!/bin/bash
-cd demo
 jwasm -q -Fodemo1.obj demo1.asm
 cp demo.in demo1.bin
 ../omfpatch demo1.bin demo.map demo1.obj
