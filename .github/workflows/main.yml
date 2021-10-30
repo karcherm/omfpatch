@@ -36,6 +36,7 @@ jobs:
 
   test-linux:
     runs-on: ubuntu-latest
+    needs: build-linux
     steps:
       - uses: actions/checkout@v2
       - uses: karcherm/action-install-jw@v.0.01
@@ -44,12 +45,11 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: executable-linux
+      - run: chmod 755 omfpatch
       - run: |
           cd demo
           jwasm demo1.asm
           cp demo.in demo1.bin
           ../omfpatch demo1.bin demo.map demo1.obj
           cat demo1.bin demo1.exp
-          fc demo1.bin demo1.exp
-          
-        
+          cmp demo1.bin demo1.exp
